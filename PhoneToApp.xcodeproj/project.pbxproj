@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		120C804B25A60A3D0093B04E /* CallKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 120C804A25A60A3D0093B04E /* CallKit.framework */; };
+		120C804E25A749810093B04E /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120C804D25A749810093B04E /* CallManager.swift */; };
 		12F8EE9524B33A9C00EDB1CC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F8EE9424B33A9C00EDB1CC /* AppDelegate.swift */; };
 		12F8EE9724B33A9C00EDB1CC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F8EE9624B33A9C00EDB1CC /* SceneDelegate.swift */; };
 		12F8EE9924B33A9C00EDB1CC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F8EE9824B33A9C00EDB1CC /* ViewController.swift */; };
@@ -17,6 +19,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		120C804825A603A30093B04E /* PhoneToApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhoneToApp.entitlements; sourceTree = "<group>"; };
+		120C804A25A60A3D0093B04E /* CallKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CallKit.framework; path = System/Library/Frameworks/CallKit.framework; sourceTree = SDKROOT; };
+		120C804D25A749810093B04E /* CallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallManager.swift; sourceTree = "<group>"; };
 		12F8EE9124B33A9C00EDB1CC /* PhoneToApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhoneToApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F8EE9424B33A9C00EDB1CC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		12F8EE9624B33A9C00EDB1CC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -36,6 +41,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3AD9F84905930FE83DA58AE1 /* Pods_PhoneToApp.framework in Frameworks */,
+				120C804B25A60A3D0093B04E /* CallKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +69,7 @@
 		12F8EE9324B33A9C00EDB1CC /* PhoneToApp */ = {
 			isa = PBXGroup;
 			children = (
+				120C804825A603A30093B04E /* PhoneToApp.entitlements */,
 				12F8EE9424B33A9C00EDB1CC /* AppDelegate.swift */,
 				12F8EE9624B33A9C00EDB1CC /* SceneDelegate.swift */,
 				12F8EE9824B33A9C00EDB1CC /* ViewController.swift */,
@@ -70,6 +77,7 @@
 				12F8EE9D24B33A9D00EDB1CC /* Assets.xcassets */,
 				12F8EE9F24B33A9D00EDB1CC /* LaunchScreen.storyboard */,
 				12F8EEA224B33A9D00EDB1CC /* Info.plist */,
+				120C804D25A749810093B04E /* CallManager.swift */,
 			);
 			path = PhoneToApp;
 			sourceTree = "<group>";
@@ -77,6 +85,7 @@
 		413ECB63B7ADDA65223F79EA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				120C804A25A60A3D0093B04E /* CallKit.framework */,
 				CD62D376447EA7DA8E6E2E8B /* Pods_PhoneToApp.framework */,
 			);
 			name = Frameworks;
@@ -209,6 +218,7 @@
 				12F8EE9924B33A9C00EDB1CC /* ViewController.swift in Sources */,
 				12F8EE9524B33A9C00EDB1CC /* AppDelegate.swift in Sources */,
 				12F8EE9724B33A9C00EDB1CC /* SceneDelegate.swift in Sources */,
+				120C804E25A749810093B04E /* CallManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,6 +363,7 @@
 			baseConfigurationReference = 7D2475DAE0B519816E69CC72 /* Pods-PhoneToApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PhoneToApp/PhoneToApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
 				ENABLE_BITCODE = NO;
@@ -362,7 +373,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.PhoneToApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.PhoneToAppBlog;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -374,6 +385,7 @@
 			baseConfigurationReference = 7B001FD93F4173AECFE9B037 /* Pods-PhoneToApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PhoneToApp/PhoneToApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
 				ENABLE_BITCODE = NO;
@@ -383,7 +395,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.PhoneToApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.PhoneToAppBlog;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

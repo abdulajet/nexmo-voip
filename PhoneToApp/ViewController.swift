@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     let connectionStatusLabel = UILabel()
     let client = NXMClient.shared
     var call: NXMCall?
+    let nc = NotificationCenter.default
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,37 +30,27 @@ class ViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-80-[label(20)]",
                                                            options: [], metrics: nil, views: ["label" : connectionStatusLabel]))
         
-        client.setDelegate(self)
-        client.login(withAuthToken: "ALICE_JWT")
+        nc.addObserver(self, selector: #selector(statusReceived(_:)), name: Notification.Name("Status"), object: nil)
+        nc.addObserver(self, selector: #selector(callReceived(_:)), name: Notification.Name("Call"), object: nil)
     }
     
-}
-
-extension ViewController: NXMClientDelegate {
-    func client(_ client: NXMClient, didChange status: NXMConnectionStatus, reason: NXMConnectionStatusReason) {
-            DispatchQueue.main.async { [weak self] in
-            switch status {
-            case .connected:
-                self?.connectionStatusLabel.text = "Connected"
-            case .disconnected:
-                self?.connectionStatusLabel.text = "Disconnected"
-            case .connecting:
-                self?.connectionStatusLabel.text = "Connecting"
-            @unknown default:
-                self?.connectionStatusLabel.text = "Unknown"
+    @objc func statusReceived(_ notification: NSNotification) {
+        DispatchQueue.main.async { [weak self] in
+            if let dict = notification.userInfo as NSDictionary? {
+                if let status = dict["status"] as? String {
+                    self?.connectionStatusLabel.text = status
+                }
             }
         }
     }
     
-    func client(_ client: NXMClient, didReceiveError error: Error) {
+    @objc func callReceived(_ notification: NSNotification) {
         DispatchQueue.main.async { [weak self] in
-            self?.connectionStatusLabel.text = error.localizedDescription
-        }
-    }
-    
-    func client(_ client: NXMClient, didReceive call: NXMCall) {
-        DispatchQueue.main.async { [weak self] in
-            self?.displayIncomingCallAlert(call: call)
+            if let dict = notification.userInfo as NSDictionary? {
+                if let call = dict["call"] as? NXMCall {
+                    self?.displayIncomingCallAlert(call: call)
+                }
+            }
         }
     }
     
@@ -68,8 +59,8 @@ extension ViewController: NXMClientDelegate {
         if let otherParty = call.otherCallMembers.firstObject as? NXMCallMember {
             from = otherParty.channel?.from.data ?? "Unknown"
         }
-        
-        let alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
+        let
+            alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
             self.call = call
             call.answer(nil)
@@ -78,8 +69,9 @@ extension ViewController: NXMClientDelegate {
         alert.addAction(UIAlertAction(title: "Reject", style: .default, handler: { _ in
             call.reject(nil)
         }))
-        
+
         self.present(alert, animated: true, completion: nil)
     }
+    
 }
 
