@@ -14,7 +14,6 @@ class ViewController: UIViewController {
     let connectionStatusLabel = UILabel()
     let client = NXMClient.shared
     var call: NXMCall?
-    let nc = NotificationCenter.default
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,8 +29,8 @@ class ViewController: UIViewController {
         view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-80-[label(20)]",
                                                            options: [], metrics: nil, views: ["label" : connectionStatusLabel]))
         
-        nc.addObserver(self, selector: #selector(statusReceived(_:)), name: Notification.Name("Status"), object: nil)
-        nc.addObserver(self, selector: #selector(callReceived(_:)), name: Notification.Name("Call"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(statusReceived(_:)), name: Notification.Name("Status"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(callReceived(_:)), name: Notification.Name("Call"), object: nil)
     }
     
     @objc func statusReceived(_ notification: NSNotification) {

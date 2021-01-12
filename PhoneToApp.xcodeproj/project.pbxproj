@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		120C804B25A60A3D0093B04E /* CallKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 120C804A25A60A3D0093B04E /* CallKit.framework */; };
 		120C804E25A749810093B04E /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120C804D25A749810093B04E /* CallManager.swift */; };
+		12BC7D3B25AC95990076F492 /* ProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12BC7D3A25AC95990076F492 /* ProviderDelegate.swift */; };
 		12F8EE9524B33A9C00EDB1CC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F8EE9424B33A9C00EDB1CC /* AppDelegate.swift */; };
 		12F8EE9724B33A9C00EDB1CC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F8EE9624B33A9C00EDB1CC /* SceneDelegate.swift */; };
 		12F8EE9924B33A9C00EDB1CC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F8EE9824B33A9C00EDB1CC /* ViewController.swift */; };
@@ -22,6 +23,7 @@
 		120C804825A603A30093B04E /* PhoneToApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhoneToApp.entitlements; sourceTree = "<group>"; };
 		120C804A25A60A3D0093B04E /* CallKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CallKit.framework; path = System/Library/Frameworks/CallKit.framework; sourceTree = SDKROOT; };
 		120C804D25A749810093B04E /* CallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallManager.swift; sourceTree = "<group>"; };
+		12BC7D3A25AC95990076F492 /* ProviderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderDelegate.swift; sourceTree = "<group>"; };
 		12F8EE9124B33A9C00EDB1CC /* PhoneToApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhoneToApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F8EE9424B33A9C00EDB1CC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		12F8EE9624B33A9C00EDB1CC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 				12F8EE9F24B33A9D00EDB1CC /* LaunchScreen.storyboard */,
 				12F8EEA224B33A9D00EDB1CC /* Info.plist */,
 				120C804D25A749810093B04E /* CallManager.swift */,
+				12BC7D3A25AC95990076F492 /* ProviderDelegate.swift */,
 			);
 			path = PhoneToApp;
 			sourceTree = "<group>";
@@ -219,6 +222,7 @@
 				12F8EE9524B33A9C00EDB1CC /* AppDelegate.swift in Sources */,
 				12F8EE9724B33A9C00EDB1CC /* SceneDelegate.swift in Sources */,
 				120C804E25A749810093B04E /* CallManager.swift in Sources */,
+				12BC7D3B25AC95990076F492 /* ProviderDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

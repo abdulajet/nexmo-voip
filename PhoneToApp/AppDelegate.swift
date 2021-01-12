@@ -11,32 +11,32 @@ import PushKit
 import NexmoClient
 import AVFoundation
 
+typealias PushInfo = (token: PKPushPayload, completion: () -> Void)
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
     var pushToken: Data?
-    var pushPayload: PKPushPayload?
-    let callManager = CallManager()
+    var pushInfo: PushInfo?
+    let providerDelegate = ProviderDelegate()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         AVAudioSession.sharedInstance().requestRecordPermission { (granted:Bool) in
-            print("Allow microphone use. Response: %d", granted)
+            print("Allow microphone use. Response: \(granted)")
         }
-        setupClientIfNeeded()
         registerForVoIPPushes()
+        setupClientIfNeeded()
         return true
     }
     
     func setupClientIfNeeded() {
         guard !NXMClient.shared.isConnected() else { return }
-        
-        NXMClient.shared.login(withAuthToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MTAxMTUwMDQsImp0aSI6IjM0Mzc4NGMwLTUxYmItMTFlYi1iMjBhLTFiNGUyMTA4MmY5OSIsImV4cCI6MTYxMDEzNjYwMiwiYWNsIjp7InBhdGhzIjp7Ii8qL3VzZXJzLyoqIjp7fSwiLyovY29udmVyc2F0aW9ucy8qKiI6e30sIi8qL3Nlc3Npb25zLyoqIjp7fSwiLyovZGV2aWNlcy8qKiI6e30sIi8qL2ltYWdlLyoqIjp7fSwiLyovbWVkaWEvKioiOnt9LCIvKi9hcHBsaWNhdGlvbnMvKioiOnt9LCIvKi9wdXNoLyoqIjp7fSwiLyova25vY2tpbmcvKioiOnt9fX0sInN1YiI6ImFiZHVsYWpldCIsImFwcGxpY2F0aW9uX2lkIjoiZTJkZDU3YjUtNTA3MS00NTA2LTg4MjctOGVmYTViOTZmYzlkIn0.snHXptf0Y5hcbG2fGBpIszrSt9QWuKIgBsenLIl1BTIeA8v85dbnEbB7jGV-3rUPpB_K_7FSOgMa-EvZZ86fy-gzVgMiQbNi3HbLZk8UyGUQ0Ru3JFrvATlJyAmrFww4yGui4EqNJIVyw4OkLBHzaWJIZisx73GIprRpU_5RG5QvuyUEQgc6Mu8fu3tkXTUBPNO3ukPJvallZJtsOxIFrQrvpwWd8C3nbThvsD-s6XPOO4CyTu22haABuGfg58r372i9WfsjNwrfroSoFyNuCnFFtSF1rWqE-3h8dE0LzPflq2MPQz0W3fJUwv-GkP7sVeXxSsNCH1ZVYQSZjUc2bQ")
         NXMClient.shared.setDelegate(self)
+        NXMClient.shared.login(withAuthToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MTA0NzE3NDYsImp0aSI6ImNmNDI0OWYwLTU0ZjktMTFlYi05NmI1LTNkYzNhY2QzOTQ5MSIsImV4cCI6MTYxMDQ5MzM0NSwiYWNsIjp7InBhdGhzIjp7Ii8qL3VzZXJzLyoqIjp7fSwiLyovY29udmVyc2F0aW9ucy8qKiI6e30sIi8qL3Nlc3Npb25zLyoqIjp7fSwiLyovZGV2aWNlcy8qKiI6e30sIi8qL2ltYWdlLyoqIjp7fSwiLyovbWVkaWEvKioiOnt9LCIvKi9hcHBsaWNhdGlvbnMvKioiOnt9LCIvKi9wdXNoLyoqIjp7fSwiLyova25vY2tpbmcvKioiOnt9fX0sInN1YiI6ImFiZHVsYWpldCIsImFwcGxpY2F0aW9uX2lkIjoiZTJkZDU3YjUtNTA3MS00NTA2LTg4MjctOGVmYTViOTZmYzlkIn0.acfvGXqD2eh9EHJVhPm29Xtn0JwCrrJbexzludPe6U6Z836AhbAH54H7xkk5oZ5zi9-vBi0dx-UrCGm-rVH-jF8Ged4dXAcCKLfCgPhsvnxcrWeNo8MDtUsZxUpxE-txxtl3d1UAWfkeT7PxlgSKXutETB8cno-Uf8cRburtMPUEtI5_XJrqyKrwg2_AUPCJntek02aDIPxXsXCuQL_pfLjiGAFGGUvK8ONgwteJIGZ22SdvC2jTrQjS-CJ0UpqPV33w49emBR78Acg0JEDmHjAmrGH_LgYcHLyuqQUVhX5TIIESgg0zhRouOaw1XCM3DsRdTO4yPpzb2owWFmAGeQ")
     }
     
     func registerForVoIPPushes() {
-        let voipRegistry = PKPushRegistry(queue: DispatchQueue.main)
+        let voipRegistry = PKPushRegistry(queue: nil)
         voipRegistry.delegate = self
         voipRegistry.desiredPushTypes = [PKPushType.voIP]
     }
@@ -52,47 +52,60 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: PKPushRegistryDelegate {
     func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
-        if NXMClient.shared.isConnected() {
-            enableNXMPush(with: pushCredentials.token)
-        } else {
-            setupClientIfNeeded()
-            self.pushToken = pushCredentials.token
-        }
+        self.pushToken = pushCredentials.token
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
+        invaldatePushToken()
     }
     
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        if(NXMClient.shared.isNexmoPush(userInfo: payload.dictionaryPayload) && UIApplication.shared.applicationState == .background) {
-            if NXMClient.shared.isConnected() {
-                processPush(with: payload)
-            } else {
-                setupClientIfNeeded()
-                self.pushPayload = payload
-            }
+        if(NXMClient.shared.isNexmoPush(userInfo: payload.dictionaryPayload)) {
+            let pushDict = payload.dictionaryPayload as NSDictionary
+            let from = pushDict.value(forKeyPath: "nexmo.push_info.from_user.name") as? String
+            
+            self.pushInfo = (payload, completion)
+            providerDelegate.reportCall(callerID: from ?? "Unknown")
         }
     }
     
-    func processPush(with payload: PKPushPayload) {
-        guard let nexmoPayload = NXMClient.shared.processNexmoPushPayload(payload.dictionaryPayload) else {
+    func processPush(with pushInfo: PushInfo) {
+        guard let _ = NXMClient.shared.processNexmoPushPayload(pushInfo.token.dictionaryPayload) else {
             print("Not a Nexmo push notification")
             return
         }
-        
-        let pushInfo = nexmoPayload.eventData?["push_info"] as? NSDictionary
-        let from = pushInfo?["from_user"] as? NSDictionary
-        
-        self.callManager.reportCall(callerID: (from?["name"] as? String ?? "Unknown"))
+        pushInfo.completion()
     }
     
-    func enableNXMPush(with token: Data) {
-        NXMClient.shared.enablePushNotifications(withPushKitToken: token, userNotificationToken: nil, isSandbox: true) { error in
-            if error != nil {
-                print("registration error: \(String(describing: error))")
+    func enableNXMPushIfNeeded(with token: Data) {
+        if shouldRegisterToken(with: token) {
+            NXMClient.shared.enablePushNotifications(withPushKitToken: token, userNotificationToken: nil, isSandbox: true) { error in
+                if error != nil {
+                    print("registration error: \(String(describing: error))")
+                }
+                print("push token registered")
+                UserDefaults.standard.setValue(token, forKey: "NXMPushToken")
             }
-            print("push token registered")
         }
     }
+    
+    func shouldRegisterToken(with token: Data) -> Bool {
+        let storedToken = UserDefaults.standard.object(forKey: "NXMPushToken") as? Data
+        
+        if let storedToken = storedToken, storedToken == token {
+            return false
+        }
+        
+        invaldatePushToken()
+        return true
+    }
+    
+    func invaldatePushToken() {
+        self.pushToken = nil
+        UserDefaults.standard.removeObject(forKey: "NXMPushToken")
+        NXMClient.shared.disablePushNotifications(nil)
+    }
 }
-
 
 extension AppDelegate: NXMClientDelegate {
     func client(_ client: NXMClient, didChange status: NXMConnectionStatus, reason: NXMConnectionStatusReason) {
@@ -101,10 +114,10 @@ extension AppDelegate: NXMClientDelegate {
         switch status {
         case .connected:
             if let token = pushToken {
-                enableNXMPush(with: token)
+                enableNXMPushIfNeeded(with: token)
             }
-            if let payload = pushPayload {
-                processPush(with: payload)
+            if let pushInfo = pushInfo {
+                processPush(with: pushInfo)
             }
             statusText = "Connected"
         case .disconnected:
@@ -123,13 +136,6 @@ extension AppDelegate: NXMClientDelegate {
     }
     
     func client(_ client: NXMClient, didReceive call: NXMCall) {
-        DispatchQueue.main.async { [weak self] in
-            if UIApplication.shared.applicationState == .background {
-                self?.callManager.activeCall = call
-            } else {
-                NotificationCenter.default.post(name: Notification.Name("Call"), object: self, userInfo: ["call": call])
-            }
-        }
+        NotificationCenter.default.post(name: Notification.Name("Call"), object: self, userInfo: ["call": call])
     }
-    
 }
