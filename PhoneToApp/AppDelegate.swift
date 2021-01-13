@@ -35,20 +35,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate: PKPushRegistryDelegate {
+    
+    /*
+     Register for voip push notifications.
+     */
     func registerForVoIPPushes() {
         let voipRegistry = PKPushRegistry(queue: nil)
         voipRegistry.delegate = self
         voipRegistry.desiredPushTypes = [PKPushType.voIP]
     }
     
+    /*
+     This provides the client manager with the push notification token.
+     */
     func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
         clientManager.pushToken = pushCredentials.token
     }
     
+    /*
+     If the push notification token becomes invalid,
+     the client manager needs to remove it.
+     */
     func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
         clientManager.invalidatePushToken()
     }
     
+    /*
+     This function is called when the app receives a voip push notification.
+     The client checks if it is a valid Nexmo push,
+     then reports the call to the system using the providerDelegate.
+     */
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         if clientManager.isNexmoPush(with: payload.dictionaryPayload) {
             let pushDict = payload.dictionaryPayload as NSDictionary

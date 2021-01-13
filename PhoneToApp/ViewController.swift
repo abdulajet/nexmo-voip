@@ -39,12 +39,23 @@ class ViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    /*
+     When the Nexmo client status changes,
+     the clientStatus notification will call this function.
+     This function will update the connectionStatusLabel.
+     */
     @objc func statusReceived(_ notification: NSNotification) {
         DispatchQueue.main.async { [weak self] in
             self?.connectionStatusLabel.text = notification.object as? String
         }
     }
     
+    /*
+     When the app receives a call,
+     the incomingCall notification will call this function.
+     This function will check if the incoming call has already been handled by CallKit,
+     If not it will display an alert to allow for the call to be answered.
+     */
     @objc func callReceived(_ notification: NSNotification) {
         DispatchQueue.main.async { [weak self] in
             if let call = notification.object as? NXMCall, !(self?.callBeenHandled ?? false) {
@@ -53,6 +64,11 @@ class ViewController: UIViewController {
         }
     }
     
+    /*
+     If the call is handled with the CallKit UI,
+     the handledCallCallKit notification will call this function.
+     This function will check if the incoming call alert is showing and dismiss it.
+     */
     @objc func callHandled() {
         DispatchQueue.main.async { [weak self] in
             if self?.presentedViewController != nil {

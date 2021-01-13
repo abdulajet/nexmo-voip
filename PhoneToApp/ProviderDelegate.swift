@@ -35,6 +35,11 @@ class ProviderDelegate: NSObject {
 }
 
 extension ProviderDelegate: NXMCallDelegate {
+    /*
+     The NXMCallDelegate keeps track of the call.
+     Particularly, when the call receives an error
+     or enters an end state hangup is called.
+     */
     func call(_ call: NXMCall, didReceive error: Error) {
         print(error)
         hangup()
@@ -66,6 +71,16 @@ extension ProviderDelegate: CXProviderDelegate {
         callManager.reset()
     }
     
+    
+    /*
+     When the call is answered via the CallKit UI, this function is called.
+     If the device is locked, the client needs time to reinitialize,
+     so the answerCall actions are store in a closure. If the app is in the
+     foreground, the call is ready to be answered.
+     
+     The handledCallCallKit notification is sent so that the ViewController
+     knows that the call has been handled by CallKit and can dismiss the alert.
+     */
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         NotificationCenter.default.post(name: .handledCallCallKit, object: nil)
         if activeCall?.call != nil {
@@ -90,6 +105,10 @@ extension ProviderDelegate: CXProviderDelegate {
         hangup()
     }
     
+    /*
+     This function, called when the voip push notification arrives,
+     reports the incoming call to the system. This triggers the CallKit UI.
+     */
     func reportCall(callerID: String) {
         let update = CXCallUpdate()
         let callerUUID = UUID()
@@ -106,10 +125,20 @@ extension ProviderDelegate: CXProviderDelegate {
         }
     }
     
+    
+    /*
+     If the app is in the foreground and the call is answered via the
+     ViewController alert, there is no need to display the CallKit UI.
+     */
     @objc private func callHandled() {
         provider.invalidate()
     }
     
+    /*
+     This function is called with the incomingCall notification.
+     If the device is locked, it will call the answer call closure
+     created in the CXAnswerCallAction delegate function.
+     */
     @objc private func callReceived(_ notification: NSNotification) {
         if let call = notification.object as? NXMCall {
             activeCall?.call = call
@@ -117,8 +146,12 @@ extension ProviderDelegate: CXProviderDelegate {
         }
     }
     
+    
+    /*
+     When the device is locked, the AVAudioSession needs to be configured.
+     You can read more about this issue here https://forums.developer.apple.com/thread/64544
+     */
     private func configureAudioSession() {
-        // See https://forums.developer.apple.com/thread/64544
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(AVAudioSession.Category.playAndRecord, mode: .default)

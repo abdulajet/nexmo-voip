@@ -10,6 +10,12 @@ import CallKit
 import NexmoClient
 import AVFoundation
 
+/*
+ This class keeps track of the ongoing calls.
+ When a call is ended via the CallKit UI,
+ the endCall function completes the action.
+ */
+
 final class CallManager: NSObject {
     private let callController = CXCallController()
     private var calls = [UUID]()
