@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     let connectionStatusLabel = UILabel()
     let client = NXMClient.shared
     var call: NXMCall?
+    var callBeenHandled = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +32,7 @@ class ViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(statusReceived(_:)), name: .clientStatus, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(callReceived(_:)), name: .incomingCall, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(callHandled), name: .handledCallCallKit, object: nil)
     }
     
     deinit {
@@ -45,8 +47,17 @@ class ViewController: UIViewController {
     
     @objc func callReceived(_ notification: NSNotification) {
         DispatchQueue.main.async { [weak self] in
-            if let call = notification.object as? NXMCall {
+            if let call = notification.object as? NXMCall, !(self?.callBeenHandled ?? false) {
                 self?.displayIncomingCallAlert(call: call)
+            }
+        }
+    }
+    
+    @objc func callHandled() {
+        DispatchQueue.main.async { [weak self] in
+            if self?.presentedViewController != nil {
+                self?.callBeenHandled = true
+                self?.dismiss(animated: true, completion: nil)
             }
         }
     }
@@ -60,6 +71,7 @@ class ViewController: UIViewController {
             alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
             self.call = call
+            NotificationCenter.default.post(name: .handledCallApp, object: nil)
             call.answer(nil)
             
         }))

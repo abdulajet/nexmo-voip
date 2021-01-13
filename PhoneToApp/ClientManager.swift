@@ -20,7 +20,7 @@ final class ClientManager: NSObject {
         NXMClient.shared.setDelegate(self)
     }
     
-    func login(with token: String) {
+    func login() {
         guard !NXMClient.shared.isConnected() else { return }
         NXMClient.shared.login(withAuthToken: ClientManager.jwt)
     }
@@ -117,4 +117,6 @@ struct Constants {
 extension Notification.Name {
     static let clientStatus = Notification.Name("Status")
     static let incomingCall = Notification.Name("Call")
+    static let handledCallCallKit = Notification.Name("CallHandledCallKit")
+    static let handledCallApp = Notification.Name("CallHandledApp")
 }

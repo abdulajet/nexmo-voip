@@ -18,6 +18,7 @@ class ProviderDelegate: NSObject {
         super.init()
         provider.setDelegate(self, queue: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(callReceived(_:)), name: .incomingCall, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(callHandled), name: .handledCallApp, object:nil)
     }
     
     deinit {
@@ -29,7 +30,6 @@ class ProviderDelegate: NSObject {
         providerConfiguration.supportsVideo = false
         providerConfiguration.maximumCallsPerCallGroup = 1
         providerConfiguration.supportedHandleTypes = [.generic]
-        
         return providerConfiguration
     }()
 }
@@ -51,7 +51,7 @@ extension ProviderDelegate: NXMCallDelegate {
     
     func call(_ call: NXMCall, didUpdate callMember: NXMCallMember, isMuted muted: Bool) {}
     
-    func hangup() {
+    private func hangup() {
         if let uuid = activeCall?.uuid {
             let action = CXEndCallAction(call: uuid)
             activeCall?.call?.hangup()
@@ -67,14 +67,23 @@ extension ProviderDelegate: CXProviderDelegate {
     }
     
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
-        activeCall?.answerBlock = { [weak self] in
-            guard let self = self, self.activeCall != nil else { return }
-            self.configureAudioSession()
-            self.activeCall?.call?.answer(nil)
-            self.activeCall?.call?.setDelegate(self)
-            self.activeCall?.uuid = action.callUUID
-            action.fulfill()
+        NotificationCenter.default.post(name: .handledCallCallKit, object: nil)
+        if activeCall?.call != nil {
+            answerCall(with: action)
+        } else {
+            activeCall?.answerBlock = { [weak self] in
+                guard let self = self, self.activeCall != nil else { return }
+                self.answerCall(with: action)
+            }
         }
+    }
+    
+    private func answerCall(with action: CXAnswerCallAction) {
+        self.configureAudioSession()
+        self.activeCall?.call?.answer(nil)
+        self.activeCall?.call?.setDelegate(self)
+        self.activeCall?.uuid = action.callUUID
+        action.fulfill()
     }
     
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
@@ -97,14 +106,18 @@ extension ProviderDelegate: CXProviderDelegate {
         }
     }
     
-    @objc func callReceived(_ notification: NSNotification) {
+    @objc private func callHandled() {
+        provider.invalidate()
+    }
+    
+    @objc private func callReceived(_ notification: NSNotification) {
         if let call = notification.object as? NXMCall {
             activeCall?.call = call
             activeCall?.answerBlock?()
         }
     }
     
-    func configureAudioSession() {
+    private func configureAudioSession() {
         // See https://forums.developer.apple.com/thread/64544
         let audioSession = AVAudioSession.sharedInstance()
         do {
