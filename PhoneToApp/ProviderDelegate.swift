@@ -2,18 +2,26 @@ import CallKit
 import NexmoClient
 import AVFoundation
 
+struct PushCall {
+    var call: NXMCall?
+    var uuid: UUID?
+    var answerBlock: (() -> Void)?
+}
+
 class ProviderDelegate: NSObject {
     private let callManager = CallManager()
     private let provider: CXProvider
-    private var activeCall: NXMCall?
-    private var activeCallId: UUID?
-    private var answerCallBlock: (() -> Void)?
+    private var activeCall: PushCall? = PushCall()
     
     override init() {
         provider = CXProvider(configuration: ProviderDelegate.providerConfiguration)
         super.init()
         provider.setDelegate(self, queue: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(callReceived(_:)), name: Notification.Name("Call"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(callReceived(_:)), name: .incomingCall, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     static var providerConfiguration: CXProviderConfiguration = {
@@ -29,27 +37,28 @@ class ProviderDelegate: NSObject {
 extension ProviderDelegate: NXMCallDelegate {
     func call(_ call: NXMCall, didReceive error: Error) {
         print(error)
-        if let uuid = activeCallId {
-            activeCall?.hangup()
-            activeCall = nil
-            callManager.endCall(with: uuid)
-        }
+        hangup()
     }
     
     func call(_ call: NXMCall, didUpdate callMember: NXMCallMember, with status: NXMCallMemberStatus) {
         switch status {
         case .canceled, .failed, .timeout, .rejected, .completed:
-            if let uuid = activeCallId {
-                activeCall?.hangup()
-                activeCall = nil
-                callManager.endCall(with: uuid)
-            }
+            hangup()
         default:
             break
         }
     }
     
     func call(_ call: NXMCall, didUpdate callMember: NXMCallMember, isMuted muted: Bool) {}
+    
+    func hangup() {
+        if let uuid = activeCall?.uuid {
+            let action = CXEndCallAction(call: uuid)
+            activeCall?.call?.hangup()
+            activeCall = nil
+            callManager.endCall(with: action)
+        }
+    }
 }
 
 extension ProviderDelegate: CXProviderDelegate {
@@ -58,24 +67,18 @@ extension ProviderDelegate: CXProviderDelegate {
     }
     
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
-        self.answerCallBlock = { [weak self] in
-            guard let self = self else { return }
-            guard self.activeCall != nil else {
-                return
-            }
+        activeCall?.answerBlock = { [weak self] in
+            guard let self = self, self.activeCall != nil else { return }
             self.configureAudioSession()
-            self.activeCall?.answer(nil)
-            self.activeCall?.setDelegate(self)
-            self.activeCallId = action.callUUID
+            self.activeCall?.call?.answer(nil)
+            self.activeCall?.call?.setDelegate(self)
+            self.activeCall?.uuid = action.callUUID
             action.fulfill()
         }
     }
     
-    
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
-        activeCall?.hangup()
-        callManager.removeCall(uuid: action.callUUID)
-        action.fulfill()
+        hangup()
     }
     
     func reportCall(callerID: String) {
@@ -95,11 +98,9 @@ extension ProviderDelegate: CXProviderDelegate {
     }
     
     @objc func callReceived(_ notification: NSNotification) {
-        if let dict = notification.userInfo as NSDictionary? {
-            if let call = dict["call"] as? NXMCall {
-                activeCall = call
-                answerCallBlock?()
-            }
+        if let call = notification.object as? NXMCall {
+            activeCall?.call = call
+            activeCall?.answerBlock?()
         }
     }
     

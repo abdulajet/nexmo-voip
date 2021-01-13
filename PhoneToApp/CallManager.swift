@@ -26,11 +26,11 @@ final class CallManager: NSObject {
         self.calls.removeAll()
     }
     
-    func endCall(with uuid: UUID) {
-        let transaction = CXTransaction(action: CXEndCallAction(call: uuid))
+    func endCall(with action: CXCallAction) {
+        let transaction = CXTransaction(action: action)
         callController.request(transaction) { error in
             guard error == nil else { return }
-            self.removeCall(uuid: uuid)
+            self.removeCall(uuid: action.uuid)
         }
     }
 }
