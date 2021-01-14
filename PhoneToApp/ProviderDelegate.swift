@@ -9,8 +9,8 @@ struct PushCall {
 }
 
 class ProviderDelegate: NSObject {
-    private let callManager = CallManager()
     private let provider: CXProvider
+    private let callController = CXCallController()
     private var activeCall: PushCall? = PushCall()
     
     override init() {
@@ -58,19 +58,25 @@ extension ProviderDelegate: NXMCallDelegate {
     
     private func hangup() {
         if let uuid = activeCall?.uuid {
-            let action = CXEndCallAction(call: uuid)
             activeCall?.call?.hangup()
-            activeCall = nil
-            callManager.endCall(with: action)
+            activeCall = PushCall()
+            
+            let action = CXEndCallAction(call: uuid)
+            let transaction = CXTransaction(action: action)
+            
+            callController.request(transaction) { error in
+                if let error = error {
+                    print(error)
+                }
+            }
         }
     }
 }
 
 extension ProviderDelegate: CXProviderDelegate {
     func providerDidReset(_ provider: CXProvider) {
-        callManager.reset()
+        activeCall = PushCall()
     }
-    
     
     /*
      When the call is answered via the CallKit UI, this function is called.
@@ -94,10 +100,10 @@ extension ProviderDelegate: CXProviderDelegate {
     }
     
     private func answerCall(with action: CXAnswerCallAction) {
-        self.configureAudioSession()
-        self.activeCall?.call?.answer(nil)
-        self.activeCall?.call?.setDelegate(self)
-        self.activeCall?.uuid = action.callUUID
+        configureAudioSession()
+        activeCall?.call?.answer(nil)
+        activeCall?.call?.setDelegate(self)
+        activeCall?.uuid = action.callUUID
         action.fulfill()
     }
     
@@ -117,11 +123,9 @@ extension ProviderDelegate: CXProviderDelegate {
         update.localizedCallerName = callerID
         update.hasVideo = false
         
-        provider.reportNewIncomingCall(with: callerUUID, update: update) { error in
-            guard error == nil else {
-                return
-            }
-            self.callManager.addCall(uuid: callerUUID)
+        provider.reportNewIncomingCall(with: callerUUID, update: update) { [weak self] error in
+            guard error == nil else { return }
+            self?.activeCall?.uuid = callerUUID
         }
     }
     

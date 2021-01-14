@@ -14,7 +14,6 @@ class ViewController: UIViewController {
     let connectionStatusLabel = UILabel()
     let client = NXMClient.shared
     var call: NXMCall?
-    var callBeenHandled = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,7 +57,7 @@ class ViewController: UIViewController {
      */
     @objc func callReceived(_ notification: NSNotification) {
         DispatchQueue.main.async { [weak self] in
-            if let call = notification.object as? NXMCall, !(self?.callBeenHandled ?? false) {
+            if let call = notification.object as? NXMCall {
                 self?.displayIncomingCallAlert(call: call)
             }
         }
@@ -72,7 +71,6 @@ class ViewController: UIViewController {
     @objc func callHandled() {
         DispatchQueue.main.async { [weak self] in
             if self?.presentedViewController != nil {
-                self?.callBeenHandled = true
                 self?.dismiss(animated: true, completion: nil)
             }
         }
