@@ -56,6 +56,10 @@ extension ProviderDelegate: NXMCallDelegate {
     
     func call(_ call: NXMCall, didUpdate callMember: NXMCallMember, isMuted muted: Bool) {}
     
+    /*
+     When a call is ended,
+     the callController.request function completes the action.
+     */
     private func hangup() {
         if let uuid = activeCall?.uuid {
             activeCall?.call?.hangup()

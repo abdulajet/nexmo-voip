@@ -52,8 +52,7 @@ class ViewController: UIViewController {
     /*
      When the app receives a call,
      the incomingCall notification will call this function.
-     This function will check if the incoming call has already been handled by CallKit,
-     If not it will display an alert to allow for the call to be answered.
+     It will display an alert to allow for the call to be answered.
      */
     @objc func callReceived(_ notification: NSNotification) {
         DispatchQueue.main.async { [weak self] in
