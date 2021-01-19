@@ -15,7 +15,7 @@ final class ClientManager: NSObject {
     
     static let shared = ClientManager()
     
-    static let jwt = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MTA2NDI0NjUsImp0aSI6IjRiOTQ4MzkwLTU2ODctMTFlYi1iMjY0LTA5OTAyOWI2MjQzZSIsImV4cCI6MTYxMDY2NDA2NCwiYWNsIjp7InBhdGhzIjp7Ii8qL3VzZXJzLyoqIjp7fSwiLyovY29udmVyc2F0aW9ucy8qKiI6e30sIi8qL3Nlc3Npb25zLyoqIjp7fSwiLyovZGV2aWNlcy8qKiI6e30sIi8qL2ltYWdlLyoqIjp7fSwiLyovbWVkaWEvKioiOnt9LCIvKi9hcHBsaWNhdGlvbnMvKioiOnt9LCIvKi9wdXNoLyoqIjp7fSwiLyova25vY2tpbmcvKioiOnt9fX0sInN1YiI6ImFiZHVsYWpldCIsImFwcGxpY2F0aW9uX2lkIjoiZTJkZDU3YjUtNTA3MS00NTA2LTg4MjctOGVmYTViOTZmYzlkIn0.M1IqVI_RzvmxPxE-185lRjhRfviJY0UsUYAz8ujS6MOJ6k0UOnn2BcmgggOQkBrSwr5O2fr3pqWwq5BD3hukW-h9VEMfvt73vS99-uajR79E1fQQ3L_D9PaMkY4GaVpzTnhd5mLqwK2wXA5DM4fB0GzOY9BGqNwoJXCW-oOZ7Cx6cXzq5OfzRu28IpdNinNVPCA5cujSjZsocX6SfULkNWhbBVEyFVvf3L_Oa4xYVPZX66606PL5eADdP8EgFGFaIIWy5Ma2pCeC4sgB9Q-Hnr6-F0BBJ5R_s6a0qXDdiSLVi6gd5rZP1mFT4NDw1I_uHUVeyJzhbcCqIFlpjwQHig"
+    static let jwt = "ALICE_JWT"
     
     override init() {
         super.init()

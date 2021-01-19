@@ -8,7 +8,7 @@ struct PushCall {
     var answerBlock: (() -> Void)?
 }
 
-class ProviderDelegate: NSObject {
+final class ProviderDelegate: NSObject {
     private let provider: CXProvider
     private let callController = CXCallController()
     private var activeCall: PushCall? = PushCall()
@@ -78,6 +78,7 @@ extension ProviderDelegate: NXMCallDelegate {
 }
 
 extension ProviderDelegate: CXProviderDelegate {
+    
     func providerDidReset(_ provider: CXProvider) {
         activeCall = PushCall()
     }
@@ -133,7 +134,6 @@ extension ProviderDelegate: CXProviderDelegate {
         }
     }
     
-    
     /*
      If the app is in the foreground and the call is answered via the
      ViewController alert, there is no need to display the CallKit UI.
@@ -153,7 +153,6 @@ extension ProviderDelegate: CXProviderDelegate {
             activeCall?.answerBlock?()
         }
     }
-    
     
     /*
      When the device is locked, the AVAudioSession needs to be configured.

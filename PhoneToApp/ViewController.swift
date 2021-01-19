@@ -11,9 +11,8 @@ import NexmoClient
 
 class ViewController: UIViewController {
     
-    let connectionStatusLabel = UILabel()
-    let client = NXMClient.shared
-    var call: NXMCall?
+    private let connectionStatusLabel = UILabel()
+    private var call: NXMCall?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,8 +79,7 @@ class ViewController: UIViewController {
         if let otherParty = call.otherCallMembers.firstObject as? NXMCallMember {
             from = otherParty.channel?.from.data ?? "Unknown"
         }
-        let
-            alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
+        let alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
             self.call = call
             NotificationCenter.default.post(name: .handledCallApp, object: nil)
@@ -94,6 +92,4 @@ class ViewController: UIViewController {
         
         self.present(alert, animated: true, completion: nil)
     }
-    
 }
-

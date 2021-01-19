@@ -12,8 +12,8 @@ import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    let clientManager = ClientManager.shared
-    let providerDelegate = ProviderDelegate()
+    private let clientManager = ClientManager.shared
+    private let providerDelegate = ProviderDelegate()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -39,7 +39,7 @@ extension AppDelegate: PKPushRegistryDelegate {
     /*
      Register for voip push notifications.
      */
-    func registerForVoIPPushes() {
+    private func registerForVoIPPushes() {
         let voipRegistry = PKPushRegistry(queue: nil)
         voipRegistry.delegate = self
         voipRegistry.desiredPushTypes = [PKPushType.voIP]
@@ -71,7 +71,7 @@ extension AppDelegate: PKPushRegistryDelegate {
             let from = pushDict.value(forKeyPath: Constants.fromKeyPath) as? String
             
             clientManager.pushInfo = (payload, completion)
-            providerDelegate.reportCall(callerID: from ?? "Unknown")
+            providerDelegate.reportCall(callerID: from ?? "Vonage Call")
         }
     }
 }
